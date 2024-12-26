@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>상품 목록</h2>
+
+<!-- 검색 폼 -->
+<form method="get" action="{% url 'products:product_list' %}">
+    <input type="text" name="search" placeholder="검색어를 입력하세요" value="{{ request.GET.search }}">
+    <button type="submit">검색</button>
+</form>
+
+<!-- 정렬 옵션 -->
+<form method="get" action="{% url 'products:product_list' %}">
+    <label>
+        <input type="radio" name="sort" value="created_at" {% if request.GET.sort == "created_at" or not request.GET.sort %}checked{% endif %}>
+        최신순
+    </label>
+    <label>
+        <input type="radio" name="sort" value="likes" {% if request.GET.sort == "likes" %}checked{% endif %}>
+        인기순 (찜수)
+    </label>
+    <label>
+        <input type="radio" name="sort" value="views" {% if request.GET.sort == "views" %}checked{% endif %}>
+        조회수순
+    </label>
+    <button type="submit">정렬</button>
+</form>
+
+<!-- 상품 목록 -->
+<div class="product-grid">
+    {% for product in products %}
+    <a href="{% url 'products:product_detail' product.id %}" class="product-card">
+        <!-- 이미지 기본값 처리 -->
+        <img src="{{ product.image.url|default:'/static/images/default_product.png' }}" alt="{{ product.title }}">
+        <div class="product-info">
+            <div class="product-title">{{ product.title }}</div>
+        </div>
+    </a>
+    {% empty %}
+    <p>상품이 없습니다.</p>
+    {% endfor %}
+</div>
+
+<a href="{% url 'products:product_create' %}">상품 등록</a>
+{% endblock %}
