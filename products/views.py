@@ -22,15 +22,17 @@ def product_list_view(request):
         ).distinct()  # 중복 제거
 
     # 정렬 옵션 적용
-    if sort_by == 'likes':
-        products = products.annotate(like_count=Count('likes')).order_by('-like_count', '-created_at')
-    elif sort_by == 'views':
+    products = products.annotate(like_count=Count('likes'))  # 모든 정렬에서 like_count 포함
+
+    if sort_by == 'likes':  # 인기순 정렬
+        products = products.order_by('-like_count', '-created_at')
+    elif sort_by == 'views':  # 조회수순 정렬
         products = products.order_by('-views', '-created_at')
-    else:  # 기본값: 최신순
+    else:  # 최신순 정렬
         products = products.order_by('-created_at')
 
-    # 검색어와 필터링된 상품 리스트를 템플릿으로 전달
     return render(request, 'products/product_list.html', {'products': products, 'query': query})
+
 
 @login_required
 def product_create_view(request):
@@ -78,10 +80,18 @@ def product_delete_view(request, pk):
 # 상품 상세 보기: 조회수 증가 포함
 def product_detail_view(request, pk):
     product = get_object_or_404(Product, pk=pk)
+    
     # 조회수 증가
     product.views += 1
     product.save()
-    return render(request, 'products/product_detail.html', {'product': product})
+    
+    # 찜수 계산
+    like_count = product.likes.count()
+    
+    return render(request, 'products/product_detail.html', {
+        'product': product,
+        'like_count': like_count,
+    })
 
 # 찜하기(좋아요) 처리
 def product_like_view(request, pk):

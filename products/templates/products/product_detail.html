@@ -5,21 +5,23 @@
     <a href="{% url 'accounts:profile' product.user.username %}">
         {{ product.user.username }}
     </a>
-<p>조회수: {{ product.views }}</p>
-<p>찜수: {{ product.like_count }}</p>
+</p>
+<p>조회수: {{ product.views }} | 찜 수: {{ like_count }}</p>
+
+<!-- 수정/삭제 버튼 간격 추가 -->
+<div style="margin-top: 10px; margin-bottom: 10px;">
+    {% if request.user == product.user %}
+        <a href="{% url 'products:product_edit' product.id %}" style="margin-right: 10px;">수정</a>
+        <form action="{% url 'products:product_delete' product.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <a href="{% url 'products:product_delete' product.id %}">삭제</a>
+        </form>
+    {% endif %}
+</div>
 
 <!-- 상품 이미지 -->
 {% if product.image %}
     <img src="{{ product.image.url }}" alt="{{ product.title }}" width="300">
-{% endif %}
-
-<!-- 수정/삭제 버튼 (작성자만 표시) -->
-{% if request.user == product.user %}
-    <a href="{% url 'products:product_edit' product.id %}">수정</a>
-    <form action="{% url 'products:product_delete' product.id %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <a href="{% url 'products:product_delete' product.id %}">삭제</a>
-    </form>
 {% endif %}
 
 <!-- 상품 설명 -->
@@ -43,5 +45,6 @@
 </form>
 
 <!-- 목록으로 돌아가기 -->
+<p></p>
 <a href="{% url 'products:product_list' %}">목록으로 돌아가기</a>
 {% endblock %}

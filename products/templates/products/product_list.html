@@ -2,16 +2,15 @@
 {% block content %}
 <h2>상품 목록</h2>
 
-<!-- 검색 폼 -->
-<form method="get" action="{% url 'products:product_list' %}">
-    <input type="text" name="search" placeholder="검색어를 입력하세요" value="{{ request.GET.search }}">
+<!-- 검색 및 정렬 폼 -->
+<form method="get" action="{% url 'products:product_list' %}" class="search-sort-form">
+    <!-- 검색어 입력 -->
+    <input type="text" name="query" value="{{ query }}" placeholder="검색어를 입력하세요">
     <button type="submit">검색</button>
-</form>
 
-<!-- 정렬 옵션 -->
-<form method="get" action="{% url 'products:product_list' %}">
+    <!-- 정렬 옵션 -->
     <label>
-        <input type="radio" name="sort" value="created_at" {% if request.GET.sort == "created_at" or not request.GET.sort %}checked{% endif %}>
+        <input type="radio" name="sort" value="created_at" {% if not request.GET.sort or request.GET.sort == "created_at" %}checked{% endif %}>
         최신순
     </label>
     <label>
@@ -29,10 +28,15 @@
 <div class="product-grid">
     {% for product in products %}
     <a href="{% url 'products:product_detail' product.id %}" class="product-card">
-        <!-- 이미지 기본값 처리 -->
-        <img src="{{ product.image.url|default:'/static/images/default_product.png' }}" alt="{{ product.title }}">
+        <!-- 이미지 -->
+        <img src="{{ product.image.url|default:'/static/images/default_product.png' }}" alt="{{ product.title }}" class="product-image">
+
+        <!-- 상품 정보 -->
         <div class="product-info">
-            <div class="product-title">{{ product.title }}</div>
+            <h3 class="product-title">{{ product.title }}</h3>
+            <p class="product-meta">
+                조회수: {{ product.views }} | 찜수: {{ product.like_count }}
+            </p>
         </div>
     </a>
     {% empty %}
@@ -40,5 +44,5 @@
     {% endfor %}
 </div>
 
-<a href="{% url 'products:product_create' %}">상품 등록</a>
+<a href="{% url 'products:product_create' %}" class="create-button">상품 등록</a>
 {% endblock %}

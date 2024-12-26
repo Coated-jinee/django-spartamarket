@@ -24,27 +24,18 @@ class HashTag(models.Model):
 # 사용자의 등록한 상품을 저장하는 모델
 class Product(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        on_delete=models.CASCADE, 
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
         related_name='products'
     )
     title = models.CharField(max_length=100)
     description = models.TextField()
-    price = models.PositiveIntegerField(null=True, blank=True)  # 가격
-    location = models.CharField(max_length=100, null=True, blank=True)  # 위치
-    image = models.ImageField(upload_to=product_image_path, blank=True, null=True)
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_products', blank=True)
-    # 상품과 연결되어 있는 해시태그
-    # 다대다 관계
-    hashtags = models.ManyToManyField(HashTag, related_name='products', blank=True)
-    # 상품의 조회수
-    views =  models.PositiveIntegerField(default=0)
+    views = models.PositiveIntegerField(default=0)
+    hashtags = models.ManyToManyField('HashTag', related_name='products', blank=True)
 
-    @property
-    def like_count(self):
-        return self.likes.count()
-    
     def __str__(self):
         return self.title
     
